@@ -12,15 +12,15 @@ texty<-read.csv("D:/OneDrive/OneDrive - USDA/Desktop/Disturbance_abstracts.csv",
 highlight.fun<-function(x.data,term.vector,abs.column.name="Abstract.Note",cit.num.col.name="Citation.num"){
   require(crayon)
   abst.results<-list(NULL)
+
   # this will extract any abstracts with terms that mactch any of the terms in the terms vector
   # this code assumes that the abstract data is stored in a column called "Abstract.Note" - change
-
-  paste0(term.vector,collapse="|")
+  # the column name that abs.column.name is equal to in order to use a different column name.
   x.data<-suppressWarnings(x.data[str_detect(x.data[,abs.column.name],paste0(term.vector,collapse="|")),])
-  
+
   if(nrow(x.data)==0){
-    stop("Terms not found in any of the abstracts from the specified database.")
-  }
+  stop("Terms not found in any of the abstracts from the specified database.")
+}
   # iterate over each row of the subset data from above:
   for(i in 1:nrow(x.data)){
     x.dat<-x.data[i,abs.column.name]
@@ -34,10 +34,11 @@ highlight.fun<-function(x.data,term.vector,abs.column.name="Abstract.Note",cit.n
       x.dat<-str_replace_all(x.dat,regex(term.vector[j],ignore_case=T),crayon::yellow$italic(term.vector.replacements[j]))
       
     }
+    x.count<-str_count(x.data[i,abs.column.name],paste0(c(term.vector),collapse="|"))
     # store citation number along with modified abstract:
-    x.dat<-paste(x.data[i,cit.num.col.name],": ",x.dat)
+    x.dat<-paste(x.data[i,cit.num.col.name],": ",x.dat," -> term count = ",x.count," <-  ")
     abst.results[[i]]<-x.dat
-    
+
   }
   return(abst.results)
   
